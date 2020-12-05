@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import sys
 import requests
+#import logging  #comment out after succesful setup
+#logging.basicConfig(level=logging.DEBUG)   #comment out after succesful setup
 from datetime import datetime
 from pytz import timezone
 from time import sleep, time
@@ -59,6 +61,8 @@ class Inverter(object):
             for address, regs in self.units.items():
                 # by default read first 45 registers (from 0 to 44)
                 # they contain all basic information needed to report
+                sleep(1)
+                #sleep for buggy connections
                 rr = self._modbus.read_input_registers(0, 45, unit=address)
                 if not rr.isError():
                     ret = True
@@ -98,7 +102,8 @@ class Inverter(object):
         if self._modbus.connect():
             # by default read first 45 holding registers (from 0 to 44)
             # they contain more than needed data
-
+            sleep(1)
+            #sleep for buggy connections
             for address, regs in self.units.items():
                 rr = self._modbus.read_holding_registers(0, 45, unit=address)
                 if not rr.isError():
