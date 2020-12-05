@@ -39,6 +39,8 @@ class Inverter(object):
                 'status': -1,
                 'pv_power': 0.0,
                 'pv_volts': 0.0,
+                'pv1_amps': 0.0,
+                'pv2_amps': 0.0,
                 'ac_volts': 0.0,
                 'ac_power': 0.0,
                 'wh_today': 0,
@@ -74,6 +76,8 @@ class Inverter(object):
                     regs['pv_power'] = float((rr.registers[1] << 16) +
                                              rr.registers[2]) / 10
                     regs['pv_volts'] = float(rr.registers[3]) / 10
+                    regs['pv1_amps'] = float(rr.registers[4]) / 10
+                    regs['pv2_amps'] = float(rr.registers[8]) / 10
                     regs['ac_power'] = float((rr.registers[11] << 16) +
                                              rr.registers[12]) / 10
                     regs['ac_volts'] = float(rr.registers[14]) / 10
@@ -253,9 +257,9 @@ class PVOutputAPI(object):
                   "Failed to call PVOutput API after {} attempts.".format(i))
 
     def send_status(self, date, energy_gen=None, power_gen=None, energy_imp=None,
-                    power_imp=None, temp=None, vdc=None, cumulative=False, vac=None,
-                    temp_inv=None, energy_life=None, comments=None, power_vdc=None,
-                    system_id=None):
+                    power_imp=None, temp=None, vdc=None, cumulative=False, pv1_amps=None, 
+                    vac=None, temp_inv=None, energy_life=None, pv2_amps=None, comments=None,
+                    power_vdc=None, system_id=None):
         # format status payload
         payload = {
             'd': date.strftime('%Y%m%d'),
@@ -284,12 +288,16 @@ class PVOutputAPI(object):
             payload['c1'] = 1
         else:
             payload['c1'] = 0
+        if pv1_amps is not None:
+            payload['v7'] = float(pv1_amps)      
         if vac is not None:
             payload['v8'] = float(vac)
         if temp_inv is not None:
             payload['v9'] = float(temp_inv)
         if energy_life is not None:
             payload['v10'] = int(energy_life)
+        if pv2_amps is not None:
+            payload['v11'] = float(pv2_amps)
         if comments is not None:
             payload['m1'] = str(comments)[:30]
         # calculate efficiency
@@ -304,7 +312,7 @@ def main_loop():
 
     # FIXME
     # this shall be delayed
-    inv.version()
+    #inv.version()
 
     # start and stop monitoring (hour of the day)
     shStart = 5
@@ -334,9 +342,11 @@ def main_loop():
                                     energy_gen=props['wh_today'],
                                     power_gen=props['ac_power'],
                                     vdc=props['pv_volts'],
+                                    pv1_amps=props['pv1_amps'],
                                     vac=props['ac_volts'],
                                     temp=temp,
                                     temp_inv=props['temp'],
+                                    pv2_amps=props['pv2_amps'],
                                     energy_life=props['wh_total'],
                                     power_vdc=props['pv_power'],
                                     system_id=props['system_id'])
