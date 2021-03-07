@@ -41,7 +41,8 @@ class Inverter(object):
                 'pv_volts': 0.0,
                 'pv1_amps': 0.0,
                 'pv2_amps': 0.0,
-                'ac_volts': 0.0,
+                #'ac_volts': 0.0,
+                'pv2_volts': 0.0,
                 'ac_power': 0.0,
                 'wh_today': 0,
                 'wh_total': 0,
@@ -80,7 +81,8 @@ class Inverter(object):
                     regs['pv2_amps'] = float(rr.registers[8]) / 10
                     regs['ac_power'] = float((rr.registers[11] << 16) +
                                              rr.registers[12]) / 10
-                    regs['ac_volts'] = float(rr.registers[14]) / 10
+                    #regs['ac_volts'] = float(rr.registers[14]) / 10
+                    regs['pv2_volts'] = float(rr.registers[7]) / 10
                     regs['wh_today'] = float((rr.registers[26] << 16) +
                                              rr.registers[27]) * 100
                     regs['wh_total'] = float((rr.registers[28] << 16) +
@@ -257,8 +259,9 @@ class PVOutputAPI(object):
                   "Failed to call PVOutput API after {} attempts.".format(i))
 
     def send_status(self, date, energy_gen=None, power_gen=None, energy_imp=None,
-                    power_imp=None, temp=None, vdc=None, cumulative=False, pv1_amps=None, 
-                    vac=None, temp_inv=None, energy_life=None, pv2_amps=None, comments=None,
+                    power_imp=None, temp=None, vdc=None, cumulative=False, pv1_amps=None,
+                    vdc2=None, temp_inv=None, energy_life=None, pv2_amps=None, comments=None,
+                    #vac=None, temp_inv=None, energy_life=None, pv2_amps=None, comments=None,
                     power_vdc=None, system_id=None):
         # format status payload
         payload = {
@@ -289,9 +292,11 @@ class PVOutputAPI(object):
         else:
             payload['c1'] = 0
         if pv1_amps is not None:
-            payload['v7'] = float(pv1_amps)      
-        if vac is not None:
-            payload['v8'] = float(vac)
+            payload['v7'] = float(pv1_amps)
+        if vdc2 is not None:
+            payload['v8'] = float(vdc2)        
+        #if vac is not None:
+        #    payload['v8'] = float(vac)
         if temp_inv is not None:
             payload['v9'] = float(temp_inv)
         if energy_life is not None:
@@ -343,7 +348,8 @@ def main_loop():
                                     power_gen=props['ac_power'],
                                     vdc=props['pv_volts'],
                                     pv1_amps=props['pv1_amps'],
-                                    vac=props['ac_volts'],
+                                    vdc2=props['pv2_volts'],
+                                    #vac=props['ac_volts'],
                                     temp=temp,
                                     temp_inv=props['temp'],
                                     pv2_amps=props['pv2_amps'],
