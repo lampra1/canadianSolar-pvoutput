@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 import sys
 import requests
-#import logging  #comment out after succesful setup
+import logging  #comment out after succesful setup
 #logging.basicConfig(level=logging.DEBUG)   #comment out after succesful setup
+import time
 from datetime import datetime
 from pytz import timezone
 from time import sleep, time
@@ -39,10 +40,10 @@ class Inverter(object):
                 'status': -1,
                 'pv_power': 0.0,
                 'pv_volts': 0.0,
+#                'ac_volts': 0.0,
+                'pv2_volts': 0.0,
                 'pv1_amps': 0.0,
                 'pv2_amps': 0.0,
-                #'ac_volts': 0.0,
-                'pv2_volts': 0.0,
                 'ac_power': 0.0,
                 'wh_today': 0,
                 'wh_total': 0,
@@ -65,7 +66,6 @@ class Inverter(object):
                 # by default read first 45 registers (from 0 to 44)
                 # they contain all basic information needed to report
                 sleep(1)
-                #sleep for buggy connections
                 rr = self._modbus.read_input_registers(0, 45, unit=address)
                 if not rr.isError():
                     ret = True
@@ -81,7 +81,7 @@ class Inverter(object):
                     regs['pv2_amps'] = float(rr.registers[8]) / 10
                     regs['ac_power'] = float((rr.registers[11] << 16) +
                                              rr.registers[12]) / 10
-                    #regs['ac_volts'] = float(rr.registers[14]) / 10
+#                    regs['ac_volts'] = float(rr.registers[14]) / 10
                     regs['pv2_volts'] = float(rr.registers[7]) / 10
                     regs['wh_today'] = float((rr.registers[26] << 16) +
                                              rr.registers[27]) * 100
@@ -108,9 +108,9 @@ class Inverter(object):
         if self._modbus.connect():
             # by default read first 45 holding registers (from 0 to 44)
             # they contain more than needed data
-            sleep(1)
-            #sleep for buggy connections
+
             for address, regs in self.units.items():
+                sleep(1)
                 rr = self._modbus.read_holding_registers(0, 45, unit=address)
                 if not rr.isError():
                     ret = True
@@ -207,7 +207,7 @@ class PVOutputAPI(object):
         """Add live output data. Data should contain the parameters as described
         here: http://pvoutput.org/help.html#api-addstatus ."""
         sys_id = system_id if system_id is not None else self._systemID
-        self.__call("https://pvoutput.org/service/r2/addstatus.jsp", payload, sys_id)
+        self.__call("http://pvoutput.org/service/r2/addstatus.jsp", payload, sys_id)
 
     def add_output(self, payload, system_id=None):
         """Add end of day output information. Data should be a dictionary with
@@ -259,9 +259,8 @@ class PVOutputAPI(object):
                   "Failed to call PVOutput API after {} attempts.".format(i))
 
     def send_status(self, date, energy_gen=None, power_gen=None, energy_imp=None,
-                    power_imp=None, temp=None, vdc=None, cumulative=False, pv1_amps=None,
+                    power_imp=None, temp=None, vdc=None, cumulative=True, pv1_amps=None, 
                     vdc2=None, temp_inv=None, energy_life=None, pv2_amps=None, comments=None,
-                    #vac=None, temp_inv=None, energy_life=None, pv2_amps=None, comments=None,
                     power_vdc=None, system_id=None):
         # format status payload
         payload = {
@@ -273,10 +272,9 @@ class PVOutputAPI(object):
         # this trick avoids avg power to zero with inverter that reports
         # generation in 100 watts increments (Growatt and Canadian solar)
         if (energy_gen is not None):
-            if (self._wh_today_last < energy_gen):
-                payload['v1'] = int(energy_gen)
-            self._wh_today_last = int(energy_gen)
-
+        #    if (self._wh_today_last < energy_gen):
+                payload['v1'] = int(energy_life)
+        #    self._wh_today_last = int(energy_gen)
         if power_gen is not None:
             payload['v2'] = float(power_gen)
         if energy_imp is not None:
@@ -293,10 +291,10 @@ class PVOutputAPI(object):
             payload['c1'] = 0
         if pv1_amps is not None:
             payload['v7'] = float(pv1_amps)
+#        if vac is not None:
+#            payload['v8'] = float(vac)
         if vdc2 is not None:
-            payload['v8'] = float(vdc2)        
-        #if vac is not None:
-        #    payload['v8'] = float(vac)
+            payload['v8'] = float(vdc2)
         if temp_inv is not None:
             payload['v9'] = float(temp_inv)
         if energy_life is not None:
@@ -344,12 +342,12 @@ def main_loop():
                         temp = owm.temperature
 
                     pvo.send_status(date=props['date'],
-                                    energy_gen=props['wh_today'],
+                                    energy_gen=props['wh_total'],
                                     power_gen=props['ac_power'],
                                     vdc=props['pv_volts'],
                                     pv1_amps=props['pv1_amps'],
+#                                    vac=props['ac_volts'],
                                     vdc2=props['pv2_volts'],
-                                    #vac=props['ac_volts'],
                                     temp=temp,
                                     temp_inv=props['temp'],
                                     pv2_amps=props['pv2_amps'],
