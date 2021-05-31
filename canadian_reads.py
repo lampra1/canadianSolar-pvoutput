@@ -273,9 +273,9 @@ class PVOutputAPI(object):
         # this trick avoids avg power to zero with inverter that reports
         # generation in 100 watts increments (Growatt and Canadian solar)
         if (energy_gen is not None):
-        #    if (self._wh_today_last < energy_gen):
+            if (self._wh_today_last < energy_gen):
                 payload['v1'] = int(energy_gen)
-        #    self._wh_today_last = int(energy_gen)
+            self._wh_today_last = int(energy_gen)
 
         if power_gen is not None:
             payload['v2'] = float(power_gen)
