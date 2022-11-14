@@ -1,4 +1,4 @@
-FROM python:2.7-alpine
+FROM python:3.8-alpine
 LABEL maintainer="Josenivaldo Benito Jr. <jrbenito@benito.qsl.br>"
 
 COPY requirements.txt .
