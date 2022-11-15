@@ -1,19 +1,39 @@
 # Set your timezone string so pytz can grab your localtime inside docker
 # defaults to 'Etc/UTC'
-timezone='America/Sao_Paulo'
+#timezone='America/Sao_Paulo'
 
-[pvoutput]
+#[pvoutput]
 # enter a comma separated list of systems, one for each inverter.
-systemID='123456789'
-APIKEY='abcde123456789'
+#systemID='123456789'
+#APIKEY='abcde123456789'
 
-[inverters]
+#[inverters]
 # enter a comma separated list of addresses, defaults to 0x1
 #addresses=0x1,0x2,0xa2
 #port='/dev/ttyUSB0'
 
-[owm]
+#[owm]
 # optional section
 #OWMKEY='abcde123456789'
 #latitude=-22.33
 #longitude=49.75
+
+# Set your timezone string so pytz can grab your localtime inside docker
+# defaults to 'Etc/UTC'
+timezone=Europe/Athens
+
+[pvoutput]
+# enter a comma separated list of systems, one for each inverter.
+systemID=62127,61944,61083
+APIKEY=356600ca75d45a56fa3b8bcddc4608da38a7073c
+
+[inverters]
+# enter a comma separated list of addresses, defaults to 0x1
+addresses=0x2,0x1,0x3
+port=/dev/ttyUSB0
+
+[owm]
+# optional section
+OWMKEY=c94ae6957522037a3b8283f75fa0efc9
+latitude=40.29
+longitude=23.21
