@@ -34,6 +34,6 @@ port=/dev/ttyUSB0
 
 [owm]
 # optional section
-OWMKEY=c94ae6957522037a3b8283f75fa0efc9
-latitude=40.29
-longitude=23.21
+OWMKEY=XXXXXX
+latitude=XX.XX
+longitude=XX.XX
