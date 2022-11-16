@@ -25,7 +25,7 @@ timezone=Europe/Athens
 [pvoutput]
 # enter a comma separated list of systems, one for each inverter.
 systemID=62127,61944,61083
-APIKEY=356600ca75d45a56fa3b8bcddc4608da38a7073c
+APIKEY=XXXXX
 
 [inverters]
 # enter a comma separated list of addresses, defaults to 0x1
