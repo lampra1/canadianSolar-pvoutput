@@ -2,8 +2,13 @@
 # -*- coding: utf-8 -*-
 import sys
 import requests
+<<<<<<< HEAD
 import logging  #comment out after succesful setup
 #logging.basicConfig(level=logging.DEBUG)   #comment out after succesful setup
+=======
+#import logging  #comment out after succesful setup
+#logging.basicConfig(level=logging.DEBUG)   #comment out after successful setup
+>>>>>>> 4481aad (Updates for Docker)
 import time
 from datetime import datetime
 from pytz import timezone

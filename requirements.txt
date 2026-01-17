@@ -1,3 +1,8 @@
 # Mirrors prod
--r requirements/prod.txt
-
+#-r requirements/prod.txt
+configobj==5.0.8
+pymodbus==2.5.0
+pyowm==3.3.0
+pyserial==3.5
+pytz==2022.7.1
+requests==2.28.2
